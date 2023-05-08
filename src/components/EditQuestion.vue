@@ -1,29 +1,48 @@
 <script setup>
   import { ArrowDown } from '@element-plus/icons-vue'
-  import { ref,defineProps } from 'vue'
+  import { ref, defineProps, reactive, watch, } from 'vue'
 
   const props = defineProps(['isShow']);
+  const emits = defineEmits(['handleClose']);
 
-  let group = [
-    ['分类1',['预设问题1']],
-    ['分类2',['预设问题1']],
-    ['分类3',['预设问题1']],
-    ['分类4',['预设问题1']],
-    ['分类5',['预设问题1']]
-  ];
-
+  let group = reactive([
+    {
+      name: '分类1',
+      questions: ['预设问题1'],
+      isActive: true
+    },
+    {
+      name: '分类2',
+      questions: ['预设问题1'],
+      isActive: false
+    },
+    {
+      name: '分类3',
+      questions: ['预设问题1'],
+      isActive: false
+    },
+    {
+      name: '分类4',
+      questions: ['预设问题1'],
+      isActive: false
+    },
+    {
+      name: '分类5',
+      questions: ['预设问题1'],
+      isActive: false
+    }
+  ]);
   let activeIndex = ref(0);
 
-  let activeClass = (index) => {
-    if(index == 0) {
-      return ['active']
-    }
-  }
+  watch(activeIndex, (newVal,oldVal) => {
+    group[oldVal].isActive = false;
+    group[newVal].isActive = true;
+  });
 
   let input = ref('');
 
   let handleClick = (index) => {
-    activeIndex = index;
+    activeIndex.value = index;
   }
 </script>
 
@@ -32,7 +51,7 @@
   <div class="editBox editBox-content" v-show="props.isShow">
     <header>预设问题编辑</header>
     <ul class="nav-bar">
-      <li v-for="(item,index) in group" :key="index" class="nav-item" :class="activeClass(index)" @click="handleClick(index)">{{ item[0] }}<el-icon v-show="activeIndex == index"><ArrowDown/></el-icon></li>
+      <li v-for="(item,index) in group" :key="index" class="nav-item" @click="handleClick(index)" :data-active="item.isActive">{{ item.name }}<el-icon v-show="item.isActive"><ArrowDown/></el-icon></li>
     </ul>
     <main>
       <div class="qestion">预设问题1:<el-input v-model="input" class="input"/></div>
@@ -95,10 +114,6 @@
       align-items: center;
       padding: 8px 0;
       cursor: pointer;
-    }
-
-    .active {
-      color: red;
     }
 
     main {
